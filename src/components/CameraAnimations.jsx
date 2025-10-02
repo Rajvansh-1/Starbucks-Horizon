@@ -1,30 +1,29 @@
-import { useFrame } from "@react-three/fiber";
+// src/components/CameraAnimations.jsx
+import { useFrame, useThree } from "@react-three/fiber";
 import { useScroll } from "@react-three/drei";
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 
 export const CameraAnimations = () => {
-  const scroll = useScroll(); // This hook gives us the scroll progress
+  const scroll = useScroll();
   const timeline = useRef();
+  const { camera } = useThree(); // Get a reference to the scene's camera
 
-  // useFrame runs on every rendered frame
-  useFrame((state, delta) => {
-    // We update the timeline's progress based on the scroll position
+  useFrame(() => {
     if (timeline.current) {
       timeline.current.seek(scroll.offset * timeline.current.duration());
     }
   });
 
-  // useLayoutEffect runs after the component has been rendered
   useLayoutEffect(() => {
     timeline.current = gsap.timeline({ defaults: { duration: 2, ease: "power1.inOut" } });
 
-    // Define the camera's animation path
+    // Use the actual camera object as the target
     timeline.current
-      .to("camera.position", { z: 5 }, 0) // Zoom out a bit
-      .to("camera.position", { x: 2, z: 12 }, 4) // Move to the side
-      .to("camera.position", { y: -2, z: 8 }, 8); // Move down
-  }, []);
+      .to(camera.position, { z: 5 }, 0)
+      .to(camera.position, { x: 2, z: 12 }, 4)
+      .to(camera.position, { y: -2, z: 8 }, 8);
+  }, [camera]);
 
-  return null; // This component doesn't render anything visible
+  return null;
 };
