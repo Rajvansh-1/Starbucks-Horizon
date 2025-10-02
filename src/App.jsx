@@ -1,9 +1,9 @@
-// src/App.jsx
-import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
-import styled from 'styled-components'
-import { Suspense } from 'react'
-import { CoffeeBean } from './components/CoffeeBean'
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, ScrollControls } from '@react-three/drei';
+import styled from 'styled-components';
+import { Suspense } from 'react';
+import { CoffeeBean } from './components/CoffeeBean';
+import { CameraAnimations } from './components/CameraAnimations'; // Import the new component
 
 const CanvasContainer = styled.div`
   position: fixed;
@@ -18,16 +18,20 @@ function App() {
   return (
     <CanvasContainer>
       <Suspense fallback={null}>
-        <Canvas camera={{ position: [0, 0, 5], fov: 25 }}>
+        <Canvas camera={{ position: [0, 0, 10], fov: 25 }}>
           <color attach="background" args={['#101010']} />
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 10, 5]} intensity={2} />
-          <CoffeeBean />
-          <OrbitControls />
+          <ambientLight intensity={1.5} />
+          <directionalLight intensity={2} position={[5, 5, 5]} />
+
+          {/* ScrollControls wraps the scene that will be affected by scroll */}
+          <ScrollControls pages={10} damping={0.25}>
+            <CameraAnimations />
+            <CoffeeBean />
+          </ScrollControls>
         </Canvas>
       </Suspense>
     </CanvasContainer>
-  )
+  );
 }
 
-export default App
+export default App;

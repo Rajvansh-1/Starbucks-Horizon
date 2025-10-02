@@ -1,42 +1,33 @@
 // src/components/CoffeeBean.jsx
 import React, { useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
 
 export function CoffeeBean(props) {
   const { nodes, materials } = useGLTF('/models/coffee_bean.glb');
-  
-  // You can remove the console.logs now if you want
-  // console.log("Model Nodes:", nodes); 
-  // console.log("Model Materials:", materials);
 
-  const meshRef = useRef();
-
-  useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.2;
-      meshRef.current.rotation.x += delta * 0.1;
+  // This robustly finds the first mesh and its material in the model,
+  // regardless of their names. This is the fix for the console error.
+  let geometry, material;
+  for (const nodeKey in nodes) {
+    if (nodes[nodeKey].isMesh) {
+      geometry = nodes[nodeKey].geometry;
+      material = materials[nodes[nodeKey].material.name];
+      break;
     }
-  });
+  }
 
-  // --- FIX IS HERE ---
-  // Replace 'Object_4' and 'Material.001' with the names you found.
-  // 'Scene' and 'Material' are very common default names.
-  const geometry = nodes.Scene?.children[0].geometry; // We find the first mesh inside the 'Scene'
-  const material = materials.Material;
-
+  // If for some reason no mesh is found, render nothing to prevent a crash.
   if (!geometry || !material) {
-    // This check is good practice
     return null;
   }
 
   return (
     <mesh
       {...props}
-      ref={meshRef}
       geometry={geometry}
       material={material}
       scale={2}
+      rotation={[0.5, 0, 0]} // Give it a slight initial tilt
       position={[0, 0, 0]}
     />
   );
